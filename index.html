@@ -1,16 +1,509 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>Page Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-    <script type="module" src="main.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=0" ;>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>lol wtf</title>
+    <style>
+        /* http://meyerweb.com/eric/tools/css/reset/ 
+                v2.0 | 20110126
+                License: none (public domain)
+            */
+        
+        html,
+        body,
+        div,
+        span,
+        applet,
+        object,
+        iframe,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        blockquote,
+        pre,
+        a,
+        abbr,
+        acronym,
+        address,
+        big,
+        cite,
+        code,
+        del,
+        dfn,
+        em,
+        img,
+        ins,
+        kbd,
+        q,
+        s,
+        samp,
+        small,
+        strike,
+        strong,
+        sub,
+        sup,
+        tt,
+        var,
+        b,
+        u,
+        i,
+        center,
+        dl,
+        dt,
+        dd,
+        ol,
+        ul,
+        li,
+        fieldset,
+        form,
+        label,
+        legend,
+        table,
+        caption,
+        tbody,
+        tfoot,
+        thead,
+        tr,
+        th,
+        td,
+        article,
+        aside,
+        canvas,
+        details,
+        embed,
+        figure,
+        figcaption,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        output,
+        ruby,
+        section,
+        summary,
+        time,
+        mark,
+        audio,
+        video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+        /* HTML5 display-role reset for older browsers */
+        
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        section {
+            display: block;
+        }
+        
+        body {
+            line-height: 1;
+        }
+        
+        ol,
+        ul {
+            list-style: none;
+        }
+        
+        blockquote,
+        q {
+            quotes: none;
+        }
+        
+        blockquote:before,
+        blockquote:after,
+        q:before,
+        q:after {
+            content: '';
+            content: none;
+        }
+        
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+    </style>
+    <style>
+        body {
+            background-color: black
+        }
+        
+        .areap {
+            background-color: white;
+            border: 1px solid black;
+        }
+        
+        button {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .invis {
+            color: transparent;
+            background-color: transparent;
+            border-color: transparent;
+            cursor: default;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 375px;
+            left: 335px;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    </link>
+    <script>
+        if ("serviceWorker" in navigator) {
+            if (navigator.serviceWorker.controller) {
+                console.log("[PWA Builder] active service worker found, no need to register");
+            } else {
+                // Register the service worker
+                navigator.serviceWorker
+                    .register("sw.js", {
+                        scope: "./"
+                    })
+                    .then(function(reg) {
+                        console.log("[PWA Builder] Service worker has been registered for scope: " + reg.scope);
+                    });
+            }
+        }
+    </script>
 </head>
 
 <body>
-    <canvas id="main" style="position: absolute; height: 98%; width: 97%; border: 1px solid black;"> </canvas>
+    <canvas class="areap" width="500" height="500"></canvas>
+    <br>
+    <div class="overlay">
+        <button class="invis" onclick="displayDate()"></button>
+        <button id="up" onmousedown="mup()" onmouseup="nup()">Up</button><br>
+        <button id="left" onmousedown="mleft()" onmouseup="nleft()">Left</button>
+        <button id="down" onmousedown="mdown()" onmouseup="ndown()">Down</button>
+        <button id="right" onmousedown="mright()" onmouseup="nright()">Right</button>
+    </div>
+    <script>
+        class RegularSprite {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            draw(ctx) {
+
+            }
+        }
+
+        class PhysicsSprite {
+            constructor(x, y, xx, yy, color) {
+                this.x = x;
+                this.y = y;
+                this.xx = xx;
+                this.yy = yy;
+                this.color = color;
+            }
+            ml() {
+                if (this.x - 5 > -5) {
+                    this.x = this.x - 5
+                }
+            }
+            mr() {
+                if (this.x + 5 < 495) {
+                    this.x = this.x + 5
+                }
+            }
+            mu() {
+                if (this.y - 5 > -5) {
+                    this.y = this.y - 5
+                }
+            }
+            md() {
+                if (this.y + 5 < 495) {
+                    this.y = this.y + 5
+                }
+            }
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.xx, this.yy);
+            }
+        }
+
+        class Player extends PhysicsSprite {
+            constructor(x, y, xx, yy, color) {
+                super(0, 500);
+                this.x = x;
+                this.y = y;
+                this.xx = xx;
+                this.yy = yy;
+                this.color = color;
+                this.hasammo = true;
+            }
+        }
+        class Enemy extends PhysicsSprite {
+            constructor(x, y, xx, yy, color) {
+                super(0, 500);
+                this.x = x;
+                this.y = y;
+                this.xx = xx;
+                this.yy = yy;
+                this.color = color;
+                this.zz = false
+                this.dir = "A";
+                this.lastchange = 10;
+            }
+            getnewdir() {
+                if (this.lastchange = 10) {
+                    var a = Math.round(Math.random(1) * 99) //0-2,3-5,6-8,9-11
+                    var b;
+                    if (a >= 0 && a <= 24) {
+                        b = "W"
+                    }
+                    if (a >= 25 && a <= 49) {
+                        b = "D"
+                    }
+                    if (a >= 50 && a <= 74) {
+                        b = "S"
+                    }
+                    if (a >= 75 && a <= 99) {
+                        b = "A"
+                    }
+                    this.dir = b
+                    this.lastchange = 0;
+                } else {
+                    this.lastchange = this.lastchange + 1;
+                }
+            }
+        }
+        class Spawner extends RegularSprite {
+            constructor(x, y, xx, yy, color) {
+                super(0, 500);
+                this.x = x;
+                this.y = y;
+                this.xx = xx;
+                this.yy = yy;
+                this.color = color;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.xx, this.yy);
+            }
+        }
+
+        gravy = 0
+        othersg = 0
+        var points = 0;
+        var downa = false;
+        var downd = false;
+        var downw = false;
+        var downs = false;
+        var lastdir = "D"
+        var wk = "";
+        var depth;
+        let ctx = null;
+        let spawner = new Spawner(250, 250, 25, 25, 'brown');
+        let avatar = new Player(0, 0, 10, 10, 'black', 1);
+        let sprites = [];
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            ctx = document.querySelector('canvas').getContext('2d');
+            window.requestAnimationFrame(gameloop);
+            sprites.push(spawner);
+            sprites.push(avatar);
+            sprites.push(new Enemy(250, 250, 10, 10, 'red'))
+        }
+        document.addEventListener('keydown', function(event) {
+            var x = event.charCode || event.keyCode;
+            wk = String.fromCharCode(x)
+            if (wk == "A") {
+                downa = true;
+                lastdir = "A"
+            }
+            if (wk == "D") {
+                downd = true;
+                lastdir = "D"
+            }
+            if (wk == "W") {
+                downw = true;
+                lastdir = "W"
+            }
+            if (wk == "S") {
+                downs = true;
+                lastdir = "S"
+            }
+            if (wk == "F") {
+                avatar.fire(lastdir)
+            }
+        });
+        document.getElementById("down").addEventListener('touchstart', function() {
+            downs = true;
+        });
+        document.getElementById("up").addEventListener('touchstart', function() {
+            downw = true;
+        });
+        document.getElementById("left").addEventListener('touchstart', function() {
+            downa = true;
+        });
+        document.getElementById("right").addEventListener('touchstart', function() {
+            downd = true;
+        });
+        document.getElementById("down").addEventListener('touchend', function() {
+            downs = false;
+        });
+        document.getElementById("up").addEventListener('touchend', function() {
+            downw = false;
+        });
+        document.getElementById("left").addEventListener('touchend', function() {
+            downa = false;
+        });
+        document.getElementById("right").addEventListener('touchend', function() {
+            downd = false;
+        });
+
+        function mleft() {
+            downa = true;
+        }
+
+        function mright() {
+            downd = true;
+        }
+
+        function mup() {
+            downw = true;
+        }
+
+        function mdown() {
+            downs = true;
+        }
+
+        function nleft() {
+            downa = false;
+        }
+
+        function nright() {
+            downd = false;
+        }
+
+        function nup() {
+            downw = false;
+        }
+
+        function ndown() {
+            downs = false;
+        }
+        document.addEventListener('keyup', function(event) {
+            var x = event.charCode || event.keyCode;
+            wk = String.fromCharCode(x)
+            if (wk == "A") {
+                downa = false;
+            }
+            if (wk == "D") {
+                downd = false;
+            }
+            if (wk == "W") {
+                downw = false;
+            }
+            if (wk == "S") {
+                downs = false;
+            }
+        });
+        var timer = 0;
+        var gameover = false;
+        var highscore = 0;
+        if (typeof(Storage) !== "undefined") {
+            if (!(localStorage.getItem("highscore") == null)) {
+                highscore = localStorage.getItem("highscore");
+            }
+        } else {
+            document.getElementById("main").innerHTML = "O Navegador não suporta armazenamento local";
+        }
+
+        function gameloop() {
+            // ctx.globalCompositeOperation = 'destination-over';
+            ctx.clearRect(0, 0, 500, 500); // clear canvas
+            if (downa == true) {
+                avatar.ml()
+            }
+            if (downd == true) {
+                avatar.mr()
+            }
+            if (downs == true) {
+                avatar.md()
+            }
+            if (downw == true) {
+                avatar.mu()
+            }
+            timer = timer + 1;
+            if (timer % 150 == 0) {
+                sprites.push(new Enemy(250, 250, 10, 10, 'red'))
+            }
+            for (const sprite of sprites) {
+                sprite.draw(ctx);
+                if (sprite instanceof Enemy) {
+                    sprite.getnewdir()
+                    if (sprite.dir == "A") {
+                        sprite.ml();
+                    }
+                    if (sprite.dir == "D") {
+                        sprite.mr();
+                    }
+                    if (sprite.dir == "W") {
+                        sprite.mu()
+                    }
+                    if (sprite.dir == "S") {
+                        sprite.md()
+                    }
+                }
+                spritesizex = sprite.x + sprite.xx
+                avatarsizex = avatar.x + avatar.xx
+                avatarsizey = avatar.y + avatar.yy
+                spritesizey = sprite.y + sprite.yy
+                if ((avatar.x < spritesizex && avatarsizex > sprite.x) && (avatar.y < spritesizey && avatarsizey > sprite.y) && !(sprite instanceof Player)) {
+                    gameover = true;
+                }
+            }
+            ctx.font = "30px Arial";
+            ctx.fillText("Score: " + timer + " Highscore: " + highscore, 10, 50);
+            if (gameover) {
+                if (timer > highscore) {
+                    highscore = timer
+                }
+                timer = 0;
+                gameover = false;
+                localStorage.setItem("highscore", highscore);
+                window.location.reload(false)
+            }
+            window.requestAnimationFrame(gameloop);
+        }
+        window.onbeforeunload = function(e) {
+            if (timer > highscore) {
+                highscore = timer
+            }
+            localStorage.setItem("highscore", highscore)
+        };
+    </script>
 </body>
 
 </html>
