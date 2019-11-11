@@ -1,37 +1,54 @@
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then(function() {
-            console.log('service worker registered');
+var cache_name = 'gih-cache';
+var cached_urls = [
+  '/index.html',
+  '/sw.js',
+  '/manifest.json'
+];
+
+self.addEventListener('install', function (event) {
+  event.waitUntil(
+    caches.open(cache_name)
+    .then(function (cache) {
+      return cache.addAll(cached_urls);
+    })
+  );
+});
+
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(function (cacheNames) {
+      return Promise.all(
+        cacheNames.map(function (cacheName) {
+          if (cacheName.startsWith('pages-cache-') && staticCacheName !== cacheName) {
+            return caches.delete(cacheName);
+          }
         })
-        .catch(function() {
-            console.warn('service worker failed');
+      );
+    })
+  );
+});
+
+self.addEventListener('fetch', function (event) {
+  console.log('Fetch event for ', event.request.url);
+  event.respondWith(
+    caches.match(event.request).then(function (response) {
+      if (response) {
+        console.log('Found ', event.request.url, ' in cache');
+        return response;
+      }
+      console.log('Network request for ', event.request.url);
+      return fetch(event.request).then(function (response) {
+        if (response.status === 404) {
+          return caches.match('fourohfour.html');
+        }
+        return caches.open(cached_urls).then(function (cache) {
+          cache.put(event.request.url, response.clone());
+          return response;
         });
-}
-var CACHE_NAME = 'static-v1';
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
-            return cache.addAll([
-                '/',
-                '/index.html',
-                '/sw.js',
-                '/manifest.json'
-            ]);
-        })
-    )
-});
-var CACHE_NAME = 'static-v1';
-self.addEventListener('activate', function activator(event) {
-    event.waitUntil(caches.keys().then(function(keys) {
-        return Promise.all(keys.filter(function(key) {
-            return key.indexOf(CACHE_NAME) !== 0;
-        }).map(function(key) {
-            return caches.delete(key);
-        }));
-    }));
-});
-self.addEventListener('fetch', function(event) {
-    event.respondWith(caches.match(event.request).then(function(cachedResponse) {
-        return
-    }));
+      });
+    }).catch(function (error) {
+      console.log('Error, ', error);
+      return caches.match('offline.html');
+    })
+  );
 });
